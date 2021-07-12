@@ -110,7 +110,7 @@ variable "aws_account_id" {
 
 variable "tags" {
   type        = map(string)
-  description = "Default tags added to all resources, this will be added to the provider"
+  description = "Tags added to all resources, this will be added to the list of mandatory tags"
 }
 
 #  _____ _   _  ___  __________________  ___  _____ _      _____ 
