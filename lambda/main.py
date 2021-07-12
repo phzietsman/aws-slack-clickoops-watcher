@@ -218,7 +218,9 @@ def handler(event, context) -> None:
         print("--- Bucket EVENT ---")
         print(json.dumps(s3_events))
 
-        for record in s3_events["Records"]:
+        records = s3_events.get("Records", [])
+
+        for record in records:
             
             print("--- Bucket Record ---")
             print(json.dumps(record))
