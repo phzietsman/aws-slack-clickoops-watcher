@@ -47,8 +47,8 @@ variable "namespace" {
   description = "Used to identify which part of the application these resources belong to (auth, infra, api, web, data)"
 
   validation {
-    condition     = contains(["auth", "infra", "api", "web", "data"], var.namespace)
-    error_message = "Namespace needs to be : \"auth\", \"infra\", \"api\" or \"web\"."
+    condition     = contains(["sec", "auth", "infra", "api", "web", "data"], var.namespace)
+    error_message = "Namespace needs to be : \"sec\", \"auth\", \"infra\", \"api\" or \"web\"."
   }
 }
 
@@ -88,8 +88,8 @@ variable "purpose" {
   description = "Used for cost allocation purposes"
 
   validation {
-    condition     = contains(["rnd", "client", "product"], var.purpose)
-    error_message = "Purpose needs to be : \"rnd\", \"client\", \"product\"."
+    condition     = contains(["rnd", "client", "product", "self"], var.purpose)
+    error_message = "Purpose needs to be : \"rnd\", \"client\", \"product\", \"self\"."
   }
 }
 
@@ -110,7 +110,7 @@ variable "aws_account_id" {
 
 variable "tags" {
   type        = map(string)
-  description = "Default tags added to all resources, this will be added to the provider"
+  description = "Tags added to all resources, this will be added to the list of mandatory tags"
 }
 
 #  _____ _   _  ___  __________________  ___  _____ _      _____ 
@@ -164,36 +164,4 @@ locals {
     var.environment,
     var.namespace
   ])
-}
-
-
-#  _____ _   _ ___________ _   _ _____ 
-# |  _  | | | |_   _| ___ \ | | |_   _|
-# | | | | | | | | | | |_/ / | | | | |  
-# | | | | | | | | | |  __/| | | | | |  
-# \ \_/ / |_| | | | | |   | |_| | | |  
-#  \___/ \___/  \_/ \_|    \___/  \_/  
-# 
-# We use various IaC tools and have found SSM Parameters
-# a great way to share the output values between systems
-
-locals {
-  outputs = {}
-}
-
-resource "aws_ssm_parameter" "outputs" {
-
-  for_each = local.outputs
-
-  name        = "/${local.naming_prefix}/tf-output/${each.key}"
-  description = "Give other systems a handle on this code's outputs"
-
-  type   = each.value["secure"] ? "SecureString" : "String"
-  key_id = var.kms_key_other
-
-  value = jsonencode(each.value["value"])
-
-  tags = merge(local.mandatory_tags, {
-    Name = "${local.naming_prefix}-output-${each.key}"
-  })
 }
