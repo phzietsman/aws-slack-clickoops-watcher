@@ -38,6 +38,8 @@ IGNORED_MANAGEMENT_EVENTS = [
     "cognito-idp.amazonaws.com:InitiateAuth",
     "cognito-idp.amazonaws.com:RespondToAuthChallenge",
     "sso.amazonaws.com:Federate",
+    "sso.amazonaws.com:Authenticate",
+    "signin.amazonaws.com:UserAuthentication",
     "logs.amazonaws.com:StartQuery"
 ]
 READONLY_EVENTS_RE = [
@@ -97,7 +99,7 @@ def send_slack_message(user, event, s3_bucket, s3_key, webhook) -> bool:
                 "fields": [
                     {
                         "type": "mrkdwn",
-                        "text": f"*IAM Action*\n{event['eventName']}:{event['eventSource']}"
+                        "text": f"*IAM Action*\n{event['eventSource'].split('.')[0]}:{event['eventName']}"
                     },
                     {
                         "type": "mrkdwn",
