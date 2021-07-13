@@ -247,7 +247,9 @@ def handler(event, context) -> None:
                     output_dict = [record for record in event_json['Records'] if filter_user_events(record)]
                     for item in output_dict:
                         user = get_user_email(item['userIdentity']['principalId'])
-                        send_slack_message(user, item, s3_bucket=bucket, s3_key=key, webhook=webhook_url)
+                        if not send_slack_message(user, item, s3_bucket=bucket, s3_key=key, webhook=webhook_url):
+                            print("[ERROR] Slack Message not sent")
+                            print(json.dumps(item))
                 # return response['ContentType']
             except Exception as e:
                 print(e)
