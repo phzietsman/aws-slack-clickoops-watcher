@@ -40,7 +40,8 @@ IGNORED_MANAGEMENT_EVENTS = [
     "sso.amazonaws.com:Federate",
     "sso.amazonaws.com:Authenticate",
     "signin.amazonaws.com:UserAuthentication",
-    "logs.amazonaws.com:StartQuery"
+    "logs.amazonaws.com:StartQuery",
+    "iam.amazonaws.com:SimulatePrincipalPolicy"
 ]
 READONLY_EVENTS_RE = [
     "^Get",
