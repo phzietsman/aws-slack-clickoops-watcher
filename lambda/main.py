@@ -223,6 +223,7 @@ def filter_user_events(event) -> bool:
     }
 
     print("--- filter_user_events output ---")
+    print(json.dumps(event))
     print(json.dumps(info))
     
     status = is_match and not is_readonly_event and not is_readonly_action and not is_ignored_event and not is_in_event and not is_ignored_scoped_event
@@ -245,16 +246,16 @@ This functions processes CloudTrail logs from S3, filters events from the AWS Co
 """
 def handler(event, context) -> None:
 
-    print("--- SQS EVENT ---")
-    print(json.dumps(event))
+    # print("--- SQS EVENT ---")
+    # print(json.dumps(event))
 
     webhook_url = get_wekbhook()
 
     for sqs_record in event['Records']:
         s3_events = json.loads(sqs_record['body'])
 
-        print("--- Bucket EVENT ---")
-        print(json.dumps(s3_events))
+        # print("--- Bucket EVENT ---")
+        # print(json.dumps(s3_events))
 
         records = s3_events.get("Records", [])
 
@@ -268,8 +269,8 @@ def handler(event, context) -> None:
             if "CloudTrail" not in key_elements:
                 continue
 
-            print("--- CloudTrail Event ---")
-            print(json.dumps(record))
+            # print("--- CloudTrail Event ---")
+            # print(json.dumps(record))
 
             if not valid_account(key):
                 continue
