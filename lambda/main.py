@@ -34,14 +34,27 @@ IGNORED_EVENTS = {
     "REST.GET.OBJECT_LOCK_CONFIGURATION", 
     "ConsoleLogin"
 }
-IGNORED_MANAGEMENT_EVENTS = [
+IGNORED_SCOPED_EVENTS = [
     "cognito-idp.amazonaws.com:InitiateAuth",
     "cognito-idp.amazonaws.com:RespondToAuthChallenge",
+    
     "sso.amazonaws.com:Federate",
     "sso.amazonaws.com:Authenticate",
+    "sso.amazonaws.com:Logout",
+    
     "signin.amazonaws.com:UserAuthentication",
+    
     "logs.amazonaws.com:StartQuery",
-    "iam.amazonaws.com:SimulatePrincipalPolicy"
+    
+    "iam.amazonaws.com:SimulatePrincipalPolicy",
+    "iam.amazonaws.com:GenerateServiceLastAccessedDetails",
+
+    "glue.amazonaws.com:BatchGetJobs",
+    "glue.amazonaws.com:StartJobRun",
+
+    "servicecatalog.amazonaws.com:SearchProductsAsAdmin",
+    "servicecatalog.amazonaws.com:SearchProducts",
+    "servicecatalog.amazonaws.com:SearchProvisionedProducts"
 ]
 READONLY_EVENTS_RE = [
     "^Get",
@@ -170,6 +183,15 @@ def match_user_agent(txt) -> bool:
 
     return False
 
+def match_readonly_event(event) ->bool:
+    if 'readOnly' in event:
+        if event['readOnly'] == 'true' or event['readOnly'] == True:
+            return True
+        else:
+            return False
+    else:
+        return False
+
 def match_readonly_event_name(txt) -> bool:
     for expression in READONLY_EVENTS_RE:
         if check_regex(expression, txt):
@@ -180,17 +202,30 @@ def match_readonly_event_name(txt) -> bool:
 def match_ignored_events(event_name) -> bool:
     return event_name in IGNORED_EVENTS
 
-def match_ignored_management_events(event_name, event_source, management_event) -> bool:
-    return management_event == True and f'{event_source}:{event_name}' in IGNORED_MANAGEMENT_EVENTS
+def match_ignored_scoped_events(event_name, event_source) -> bool:
+    return f'{event_source}:{event_name}' in IGNORED_SCOPED_EVENTS
 
 def filter_user_events(event) -> bool:
     is_match = match_user_agent(event['userAgent'])
-    is_read_only = match_readonly_event_name(event['eventName'])
+    is_readonly_event = match_readonly_event(event)
+    is_readonly_action = match_readonly_event_name(event['eventName'])
     is_ignored_event = match_ignored_events(event['eventName'])
-    is_ignored_management_event = match_ignored_management_events(event['eventName'], event['eventSource'], event.get('managementEvent', False))
+    is_ignored_scoped_event = match_ignored_scoped_events(event['eventName'], event['eventSource'], )
     is_in_event = 'invokedBy' in event['userIdentity'] and event['userIdentity']['invokedBy'] == 'AWS Internal'
 
-    status = is_match and not is_read_only and not is_ignored_event and not is_in_event and not is_ignored_management_event
+    info = {
+        'is_match': is_match,
+        'is_readonly_event': is_readonly_event,
+        'is_readonly_action': is_readonly_action,
+        'is_ignored_event': is_ignored_event,
+        'is_ignored_scoped_event': is_ignored_scoped_event,
+        'is_in_event': is_in_event
+    }
+
+    print("--- filter_user_events output ---")
+    print(json.dumps(info))
+    
+    status = is_match and not is_readonly_event and not is_readonly_action and not is_ignored_event and not is_in_event and not is_ignored_scoped_event
 
     return status
 
@@ -224,9 +259,6 @@ def handler(event, context) -> None:
         records = s3_events.get("Records", [])
 
         for record in records:
-            
-            print("--- Bucket Record ---")
-            print(json.dumps(record))
 
             # Get the object from the event and show its content type
             bucket = record['s3']['bucket']['name']
@@ -235,6 +267,9 @@ def handler(event, context) -> None:
             key_elements = key.split("/")
             if "CloudTrail" not in key_elements:
                 continue
+
+            print("--- CloudTrail Event ---")
+            print(json.dumps(record))
 
             if not valid_account(key):
                 continue
