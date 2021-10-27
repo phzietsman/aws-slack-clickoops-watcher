@@ -41,8 +41,13 @@ IGNORED_SCOPED_EVENTS = [
     "sso.amazonaws.com:Federate",
     "sso.amazonaws.com:Authenticate",
     "sso.amazonaws.com:Logout",
+    "sso.amazonaws.com:SearchUsers",
+    "sso.amazonaws.com:SearchGroups",
     
     "signin.amazonaws.com:UserAuthentication",
+    "signin.amazonaws.com:SwitchRole",
+    "signin.amazonaws.com:RenewRole",
+    "signin.amazonaws.com:ExternalIdPDirectoryLogin",
     
     "logs.amazonaws.com:StartQuery",
     
@@ -50,11 +55,19 @@ IGNORED_SCOPED_EVENTS = [
     "iam.amazonaws.com:GenerateServiceLastAccessedDetails",
 
     "glue.amazonaws.com:BatchGetJobs",
+    "glue.amazonaws.com:BatchGetCrawlers",
     "glue.amazonaws.com:StartJobRun",
+    "glue.amazonaws.com:StartCrawler",
 
     "servicecatalog.amazonaws.com:SearchProductsAsAdmin",
     "servicecatalog.amazonaws.com:SearchProducts",
-    "servicecatalog.amazonaws.com:SearchProvisionedProducts"
+    "servicecatalog.amazonaws.com:SearchProvisionedProducts",
+    "servicecatalog.amazonaws.com:TerminateProvisionedProduct",
+
+    "cloudshell.amazonaws.com:CreateSession",
+    "cloudshell.amazonaws.com:PutCredentials",
+    "cloudshell.amazonaws.com:SendHeartBeat",
+    "cloudshell.amazonaws.com:CreateEnvironment"
 ]
 READONLY_EVENTS_RE = [
     "^Get",
