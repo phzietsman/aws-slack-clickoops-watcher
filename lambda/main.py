@@ -59,6 +59,8 @@ IGNORED_SCOPED_EVENTS = [
     "glue.amazonaws.com:StartJobRun",
     "glue.amazonaws.com:StartCrawler",
 
+    "athena.amazonaws.com:StartQueryExecution",
+
     "servicecatalog.amazonaws.com:SearchProductsAsAdmin",
     "servicecatalog.amazonaws.com:SearchProducts",
     "servicecatalog.amazonaws.com:SearchProvisionedProducts",
