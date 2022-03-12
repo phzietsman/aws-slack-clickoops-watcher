@@ -1,3 +1,5 @@
+**NOTE** Standalone terraform module [here](https://github.com/cloudandthings/terraform-aws-clickops-notifier)
+
 # AWS ClickOops watcher for Slack
 This deployment allows you to monitor your AWS accounts for changes being made in the console.
 
